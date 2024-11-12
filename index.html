@@ -1,82 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cosmic Latte CAPTCHA</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-        }
-        .container {
-            text-align: center;
-        }
-        h2 {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-            max-width: 300px;
-        }
-        .captcha-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 80px);
-            grid-gap: 10px;
-        }
-        .captcha-item {
-            width: 80px;
-            height: 80px;
-            background-color: #f5e9d7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .captcha-item:hover {
-            transform: translate(calc(30px - 60px * (Math.random())), calc(30px - 60px * (Math.random())));
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hedgehog Game</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; background: #1c1c40; } /* Dark blue-ish background for night effect */
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2>To prove your humanity, find the cosmic latte square that stays calm in the chaos.</h2>
-        <div class="captcha-grid" id="captchaGrid"></div>
-    </div>
-
-    <script>
-        // Define colors for cosmic latte squares
-        const cosmicLatteColors = ["#FFF8E7", "#FFF4E1", "#F5EAD6", "#FDF5E6", "#FAF3E0", "#FAF2DC", "#FFF9E3", "#FDF1CF", "#F7E8D0"];
-        
-        // Create squares and add to the grid
-        const captchaGrid = document.getElementById('captchaGrid');
-        const correctIndex = Math.floor(Math.random() * 9);
-
-        for (let i = 0; i < 9; i++) {
-            const square = document.createElement('div');
-            square.classList.add('captcha-item');
-            square.style.backgroundColor = cosmicLatteColors[Math.floor(Math.random() * cosmicLatteColors.length)];
-            
-            // Only the correct square doesn't move on hover
-            if (i === correctIndex) {
-                square.removeEventListener('mouseenter', moveSquare);
-                square.addEventListener('click', () => alert("Congratulations! You've proven your humanity."));
-            } else {
-                square.addEventListener('mouseenter', moveSquare);
-            }
-            
-            captchaGrid.appendChild(square);
-        }
-
-        // Function to move the square randomly on hover
-        function moveSquare(event) {
-            const square = event.target;
-            square.style.transform = `translate(${30 - Math.random() * 60}px, ${30 - Math.random() * 60}px)`;
-        }
-    </script>
+  <canvas id="gameCanvas"></canvas>
+  <script src="game.js"></script>
 </body>
 </html>
