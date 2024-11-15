@@ -3,21 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puzzle Game</title>
+    <title>Abstract Puzzle Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background: linear-gradient(45deg, #1e1e1e, #3c3c3c);
+            color: white;
             text-align: center;
-            background-color: #f0f0f0;
         }
         #game-container {
-            margin: 20px;
+            margin: 20px auto;
             padding: 20px;
-            background: white;
+            max-width: 600px;
+            background: #222;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
         }
         .hidden {
             display: none;
@@ -30,62 +32,77 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            transition: background 0.3s;
         }
         .button:hover {
             background-color: #45a049;
         }
-        .drag-container {
+        .puzzle-container {
+            margin: 20px;
             display: flex;
             justify-content: center;
-            gap: 20px;
+            align-items: center;
+            gap: 10px;
         }
-        .fruit {
-            width: 100px;
-            height: 100px;
+        .color-block {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #444;
             cursor: grab;
+            transition: transform 0.2s;
+        }
+        .color-block:hover {
+            transform: scale(1.1);
         }
         .drop-zone {
-            width: 100px;
-            height: 100px;
-            border: 2px dashed #ccc;
-            border-radius: 10px;
+            width: 50px;
+            height: 50px;
+            border: 2px dashed #666;
         }
-        .drop-zone img {
-            width: 100%;
-            height: 100%;
+        .glow-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ff5e5e, #ff0000);
+            position: relative;
+            cursor: pointer;
+        }
+        canvas {
+            border: 2px solid #444;
+            margin: 10px auto;
         }
     </style>
 </head>
 <body>
     <div id="game-container">
+        <!-- Stage 1: Drag Colour Blocks -->
         <div id="stage-1">
-            <h2>Stage 1: Drag and Drop</h2>
-            <p>Rearrange the fruits in alphabetical order:</p>
-            <div id="drag-container" class="drag-container">
-                <img src="apple.png" alt="Apple" class="fruit" draggable="true" id="apple">
-                <img src="banana.png" alt="Banana" class="fruit" draggable="true" id="banana">
-                <img src="cherry.png" alt="Cherry" class="fruit" draggable="true" id="cherry">
+            <h2>Stage 1: Drag Colour Blocks</h2>
+            <p>Rearrange the colour blocks into the correct gradient:</p>
+            <div class="puzzle-container" id="color-blocks">
+                <div class="color-block" draggable="true" style="background: #ff8c00;" data-order="3"></div>
+                <div class="color-block" draggable="true" style="background: #8a2be2;" data-order="2"></div>
+                <div class="color-block" draggable="true" style="background: #00ced1;" data-order="1"></div>
             </div>
-            <div id="drop-container" class="drag-container">
-                <div class="drop-zone" data-order="1"></div>
-                <div class="drop-zone" data-order="2"></div>
-                <div class="drop-zone" data-order="3"></div>
+            <div class="puzzle-container" id="drop-zones">
+                <div class="drop-zone"></div>
+                <div class="drop-zone"></div>
+                <div class="drop-zone"></div>
             </div>
             <button class="button" onclick="checkStage1()">Submit</button>
         </div>
 
+        <!-- Stage 2 Placeholder -->
         <div id="stage-2" class="hidden">
-            <h2>Stage 2: Spot the Difference</h2>
-            <p>Find and click the difference:</p>
-            <div style="display: flex; justify-content: center; gap: 20px;">
-                <img id="img1" src="image1.jpg" alt="Image 1" style="width: 300px;">
-                <img id="img2" src="image2.jpg" alt="Image 2" style="width: 300px;">
-            </div>
+            <h2>Stage 2: Pixel Match Puzzle</h2>
+            <p>Match the shown pixel pattern!</p>
+            <canvas id="pixelCanvas" width="300" height="300"></canvas>
             <button class="button" onclick="nextStage(3)">Next</button>
         </div>
 
         <!-- Add more stages here -->
 
+        <!-- Final Stage -->
         <div id="final-stage" class="hidden">
             <h2>Congratulations!</h2>
             <p>Enter your email to join Project XAEL:</p>
@@ -95,33 +112,33 @@
     </div>
 
     <script>
-        // Drag-and-Drop Logic
-        const fruits = document.querySelectorAll('.fruit');
+        // Stage 1: Drag-and-Drop Color Blocks
+        const colorBlocks = document.querySelectorAll('.color-block');
         const dropZones = document.querySelectorAll('.drop-zone');
 
-        fruits.forEach(fruit => {
-            fruit.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('id', e.target.id);
+        colorBlocks.forEach(block => {
+            block.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('order', e.target.dataset.order);
+                e.dataTransfer.setData('html', e.target.outerHTML);
             });
         });
 
         dropZones.forEach(zone => {
             zone.addEventListener('dragover', (e) => e.preventDefault());
             zone.addEventListener('drop', (e) => {
-                const id = e.dataTransfer.getData('id');
-                const draggedElement = document.getElementById(id);
+                e.preventDefault();
                 if (!e.target.hasChildNodes()) {
-                    e.target.appendChild(draggedElement);
+                    e.target.innerHTML = e.dataTransfer.getData('html');
                 }
             });
         });
 
         function checkStage1() {
-            const correctOrder = ['apple', 'banana', 'cherry'];
+            const correctOrder = ['1', '2', '3'];
             let playerOrder = [];
             dropZones.forEach(zone => {
                 if (zone.firstChild) {
-                    playerOrder.push(zone.firstChild.id);
+                    playerOrder.push(zone.firstChild.dataset.order);
                 }
             });
             if (JSON.stringify(playerOrder) === JSON.stringify(correctOrder)) {
