@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        #game-container {
+            margin: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .hidden {
+            display: none;
+        }
+        .button {
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="stage-1">
+            <h2>Stage 1: Drag and Drop</h2>
+            <p>Sort the items in alphabetical order:</p>
+            <div id="items" style="display: flex; justify-content: center; gap: 10px;">
+                <div draggable="true" class="item" style="padding: 10px; background: lightblue;">Banana</div>
+                <div draggable="true" class="item" style="padding: 10px; background: lightcoral;">Apple</div>
+                <div draggable="true" class="item" style="padding: 10px; background: lightgreen;">Cherry</div>
+            </div>
+            <button class="button" onclick="checkStage1()">Submit</button>
+        </div>
+
+        <div id="stage-2" class="hidden">
+            <h2>Stage 2: Spot the Difference</h2>
+            <p>Find and click the difference:</p>
+            <div style="display: flex; justify-content: center; gap: 20px;">
+                <img id="img1" src="image1.jpg" alt="Image 1">
+                <img id="img2" src="image2.jpg" alt="Image 2">
+            </div>
+            <button class="button" onclick="nextStage(3)">Next</button>
+        </div>
+
+        <!-- Add stages here -->
+
+        <div id="final-stage" class="hidden">
+            <h2>Congratulations!</h2>
+            <p>Enter your email to join Project XAEL:</p>
+            <input type="email" id="email" placeholder="Enter your email" style="padding: 10px; width: 60%;">
+            <button class="button" onclick="submitEmail()">Submit</button>
+        </div>
+    </div>
+
+    <script>
+        function checkStage1() {
+            const items = Array.from(document.querySelectorAll('#items .item'));
+            const sorted = items.map(item => item.textContent).join(',') === 'Apple,Banana,Cherry';
+            if (sorted) nextStage(2);
+            else alert('Incorrect order. Try again.');
+        }
+
+        function nextStage(stageNumber) {
+            document.querySelector(`#stage-${stageNumber - 1}`).classList.add('hidden');
+            document.querySelector(`#stage-${stageNumber}`).classList.remove('hidden');
+        }
+
+        function submitEmail() {
+            const email = document.getElementById('email').value;
+            if (email) {
+                alert(`Thank you for joining Project XAEL, ${email}!`);
+            } else {
+                alert('Please enter a valid email.');
+            }
+        }
+    </script>
+</body>
+</html>
