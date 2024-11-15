@@ -92,15 +92,16 @@
             <button class="button" onclick="checkStage1()">Submit</button>
         </div>
 
-        <!-- Stage 2 Placeholder -->
+        <!-- Stage 2: Pixel Match -->
         <div id="stage-2" class="hidden">
             <h2>Stage 2: Pixel Match Puzzle</h2>
-            <p>Match the shown pixel pattern!</p>
+            <p>Click on the pixel that matches the colour shown below:</p>
+            <div id="pixel-colour" style="margin-bottom: 10px; height: 50px; width: 50px; background: #8a2be2;"></div>
             <canvas id="pixelCanvas" width="300" height="300"></canvas>
-            <button class="button" onclick="nextStage(3)">Next</button>
+            <button class="button" onclick="checkStage2()">Submit</button>
         </div>
 
-        <!-- Add more stages here -->
+        <!-- Add more stages -->
 
         <!-- Final Stage -->
         <div id="final-stage" class="hidden">
@@ -112,7 +113,7 @@
     </div>
 
     <script>
-        // Stage 1: Drag-and-Drop Color Blocks
+        // Drag-and-Drop Logic (Stage 1)
         const colorBlocks = document.querySelectorAll('.color-block');
         const dropZones = document.querySelectorAll('.drop-zone');
 
@@ -149,6 +150,53 @@
             }
         }
 
+        // Stage 2: Pixel Match Logic
+        const canvas = document.getElementById('pixelCanvas');
+        const ctx = canvas.getContext('2d');
+        const targetColour = '#8a2be2';
+        let matched = false;
+
+        function generatePixels() {
+            for (let x = 0; x < 300; x += 10) {
+                for (let y = 0; y < 300; y += 10) {
+                    const colour = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+                    ctx.fillStyle = colour;
+                    ctx.fillRect(x, y, 10, 10);
+                    if (Math.random() < 0.05 && !matched) {
+                        ctx.fillStyle = targetColour;
+                        ctx.fillRect(x, y, 10, 10);
+                        matched = true;
+                    }
+                }
+            }
+        }
+
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const data = ctx.getImageData(x, y, 1, 1).data;
+            const clickedColour = `rgb(${data[0]}, ${data[1]}, ${data[2]})`;
+            const targetRGB = 'rgb(138, 43, 226)';
+            if (clickedColour === targetRGB) {
+                alert('Correct pixel!');
+                matched = true;
+            } else {
+                alert('Wrong pixel. Try again.');
+            }
+        });
+
+        generatePixels();
+
+        function checkStage2() {
+            if (matched) {
+                alert('You passed Stage 2!');
+                nextStage(3); // Move to next stage
+            } else {
+                alert('Find the correct pixel first!');
+            }
+        }
+
         // Navigation between stages
         function nextStage(stageNumber) {
             document.querySelector(`#stage-${stageNumber - 1}`).classList.add('hidden');
@@ -166,4 +214,3 @@
     </script>
 </body>
 </html>
-
