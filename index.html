@@ -59,14 +59,6 @@
             height: 50px;
             border: 2px dashed #666;
         }
-        .glow-dot {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #ff5e5e, #ff0000);
-            position: relative;
-            cursor: pointer;
-        }
         canvas {
             border: 2px solid #444;
             margin: 10px auto;
@@ -75,14 +67,14 @@
 </head>
 <body>
     <div id="game-container">
-        <!-- Stage 1: Drag Colour Blocks -->
+        <!-- Stage 1: Drag Grey Blocks -->
         <div id="stage-1">
-            <h2>Stage 1: Drag Colour Blocks</h2>
-            <p>Rearrange the colour blocks into the correct gradient:</p>
+            <h2>Stage 1: Drag Grey Blocks</h2>
+            <p>Rearrange the grey blocks into the correct gradient (lightest to darkest):</p>
             <div class="puzzle-container" id="color-blocks">
-                <div class="color-block" draggable="true" style="background: #ff8c00;" data-order="3"></div>
-                <div class="color-block" draggable="true" style="background: #8a2be2;" data-order="2"></div>
-                <div class="color-block" draggable="true" style="background: #00ced1;" data-order="1"></div>
+                <div class="color-block" draggable="true" style="background: #666;" data-order="3"></div>
+                <div class="color-block" draggable="true" style="background: #aaa;" data-order="2"></div>
+                <div class="color-block" draggable="true" style="background: #ddd;" data-order="1"></div>
             </div>
             <div class="puzzle-container" id="drop-zones">
                 <div class="drop-zone"></div>
@@ -100,8 +92,6 @@
             <canvas id="pixelCanvas" width="300" height="300"></canvas>
             <button class="button" onclick="checkStage2()">Submit</button>
         </div>
-
-        <!-- Add more stages here -->
 
         <!-- Final Stage -->
         <div id="final-stage" class="hidden">
