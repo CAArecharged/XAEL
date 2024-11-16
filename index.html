@@ -12,6 +12,7 @@
             background: linear-gradient(45deg, #1e1e1e, #3c3c3c);
             color: white;
             text-align: center;
+            overflow: hidden;
         }
         #game-container {
             margin: 50px auto;
@@ -72,7 +73,7 @@
             height: 20px;
             border-radius: 50%;
             background: #ff5e5e;
-            position: relative;
+            position: absolute;
         }
         input[type="email"] {
             padding: 10px;
@@ -139,7 +140,7 @@
             if (stage) stage.classList.remove('hidden');
         }
 
-        // Reliable Drag-and-Drop Logic (Stage 1)
+        // Drag-and-Drop Logic (Stage 1)
         const colorBlocks = document.querySelectorAll('.color-block');
         const dropZones = document.querySelectorAll('.drop-zone');
 
@@ -236,15 +237,20 @@
 
         generatePixels();
 
+        // Moving Dot (Stage 3)
         const movingDot = document.getElementById('moving-dot');
         let dotInterval;
 
-        function moveDot() {
-            let x = 0;
-            dotInterval = setInterval(() => {
-                x = (x + 5) % 300;
-                movingDot.style.left = `${x}px`;
-            }, 50);
+        function moveDotRandomly() {
+            let x = Math.random() * window.innerWidth - 20;
+            let y = Math.random() * window.innerHeight - 20;
+
+            movingDot.style.top = `${Math.max(0, y)}px`;
+            movingDot.style.left = `${Math.max(0, x)}px`;
+        }
+
+        function startDotMovement() {
+            dotInterval = setInterval(moveDotRandomly, 500);
         }
 
         movingDot.addEventListener('click', () => {
@@ -252,7 +258,7 @@
             nextStage(4);
         });
 
-        moveDot();
+        startDotMovement();
 
         function submitEmail() {
             const email = document.getElementById('email').value;
@@ -261,4 +267,5 @@
     </script>
 </body>
 </html>
+
 
