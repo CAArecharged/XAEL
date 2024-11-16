@@ -55,7 +55,6 @@
         .color-block[data-order="1"] { background-color: #ddd; }
         .color-block[data-order="2"] { background-color: #aaa; }
         .color-block[data-order="3"] { background-color: #666; }
-
         .color-block:hover {
             transform: scale(1.1);
         }
@@ -73,7 +72,7 @@
             height: 20px;
             border-radius: 50%;
             background: #ff5e5e;
-            position: absolute;
+            position: relative;
         }
         input[type="email"] {
             padding: 10px;
@@ -173,6 +172,7 @@
                 const originalBlock = document.querySelector(`.color-block[data-order="${draggedOrder}"]`);
                 const clonedBlock = originalBlock.cloneNode(true);
                 clonedBlock.classList.remove('hidden'); // Make sure the clone is visible
+                clonedBlock.draggable = false; // Disable dragging on clones in drop zones
                 zone.appendChild(clonedBlock);
             });
         });
@@ -183,6 +183,7 @@
             if (JSON.stringify(playerOrder) === JSON.stringify(correctOrder)) {
                 nextStage(2);
             } else {
+                alert("Incorrect order! Try again.");
                 resetStage(1);
             }
         }
@@ -228,6 +229,7 @@
                 matched = true;
                 nextStage(3);
             } else {
+                alert("Incorrect pixel. Try again.");
                 resetStage(2);
             }
         });
