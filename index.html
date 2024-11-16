@@ -50,6 +50,7 @@
             border: 2px solid #444;
             cursor: grab;
             transition: transform 0.2s;
+            background: grey;
         }
         .color-block:hover {
             transform: scale(1.1);
@@ -91,9 +92,9 @@
                 <div class="color-block" draggable="true" style="background: #ddd;" data-order="1"></div>
             </div>
             <div class="puzzle-container" id="drop-zones">
-                <div class="drop-zone"></div>
-                <div class="drop-zone"></div>
-                <div class="drop-zone"></div>
+                <div class="drop-zone" data-index="1"></div>
+                <div class="drop-zone" data-index="2"></div>
+                <div class="drop-zone" data-index="3"></div>
             </div>
             <button class="button" onclick="checkStage1()">Submit</button>
         </div>
@@ -141,15 +142,8 @@
 
         colorBlocks.forEach(block => {
             block.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', e.target.dataset.order);
-                e.dataTransfer.setData('html', e.target.outerHTML);
-                setTimeout(() => {
-                    e.target.style.display = 'none';
-                }, 0);
-            });
-
-            block.addEventListener('dragend', (e) => {
-                e.target.style.display = 'block';
+                e.dataTransfer.setData('order', e.target.dataset.order);
+                e.dataTransfer.setData('id', e.target.id); // Setting ID to identify the dragged element
             });
         });
 
@@ -158,33 +152,17 @@
 
             zone.addEventListener('drop', (e) => {
                 e.preventDefault();
-                const draggedOrder = e.dataTransfer.getData('text/plain');
-                const draggedElementHTML = e.dataTransfer.getData('html');
+                const draggedOrder = e.dataTransfer.getData('order');
 
+                // Clear existing elements in drop zones
                 if (zone.firstChild) {
                     zone.removeChild(zone.firstChild);
                 }
 
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = draggedElementHTML;
-                const draggedElement = tempDiv.firstChild;
-
-                draggedElement.style.display = 'block';
+                // Append the dragged element as a copy
+                const draggedElement = document.querySelector(`.color-block[data-order="${draggedOrder}"]`).cloneNode(true);
                 draggedElement.draggable = true;
-                draggedElement.dataset.order = draggedOrder;
                 zone.appendChild(draggedElement);
-
-                draggedElement.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.setData('text/plain', e.target.dataset.order);
-                    e.dataTransfer.setData('html', e.target.outerHTML);
-                    setTimeout(() => {
-                        e.target.style.display = 'none';
-                    }, 0);
-                });
-
-                draggedElement.addEventListener('dragend', (e) => {
-                    e.target.style.display = 'block';
-                });
             });
         });
 
@@ -243,5 +221,24 @@
 
         function moveDot() {
             let x = 0;
-            dotInterval = setInterval(() =>
+            dotInterval = setInterval(() => {
+                x = (x + 5) % 300;
+                movingDot.style.left = `${x}px`;
+            }, 50);
+        }
+
+        movingDot.addEventListener('click', () => {
+            clearInterval(dotInterval);
+            nextStage(4);
+        });
+
+        moveDot();
+
+        function submitEmail() {
+            const email = document.getElementById('email').value;
+            alert(`Thank you for joining Project XAEL, ${email}!`);
+        }
+    </script>
+</body>
+</html>
 
