@@ -196,18 +196,25 @@
         function generatePixels() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             let targetPlaced = false;
+            let targetCoordinates = { x: 0, y: 0 };
+
             for (let x = 0; x < 300; x += 10) {
                 for (let y = 0; y < 300; y += 10) {
                     const randomColour = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
                     ctx.fillStyle = randomColour;
                     ctx.fillRect(x, y, 10, 10);
+
                     if (!targetPlaced && Math.random() < 0.05) {
                         ctx.fillStyle = targetColour;
                         ctx.fillRect(x, y, 10, 10);
+                        targetCoordinates = { x: x / 10 + 1, y: y / 10 + 1 };
                         targetPlaced = true;
                     }
                 }
             }
+
+            // Log the target pixel's coordinates for debugging
+            console.log(`Target Pixel Coordinates: X = ${targetCoordinates.x}, Y = ${targetCoordinates.y}`);
         }
 
         canvas.addEventListener('click', (e) => {
@@ -252,3 +259,4 @@
     </script>
 </body>
 </html>
+
