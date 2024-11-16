@@ -14,11 +14,11 @@
             text-align: center;
         }
         #game-container {
-            margin: 20px auto;
+            margin: 50px auto;
             padding: 20px;
             max-width: 600px;
             background: #222;
-            border-radius: 10px;
+            border-radius: 15px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
         }
         .hidden {
@@ -38,7 +38,7 @@
             background-color: #45a049;
         }
         .puzzle-container {
-            margin: 20px;
+            margin: 20px auto;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -61,13 +61,27 @@
         }
         canvas {
             border: 2px solid #444;
-            margin: 10px auto;
+            margin: 20px auto;
+        }
+        #moving-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff5e5e;
+            position: absolute;
+        }
+        input[type="email"] {
+            padding: 10px;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
     <div id="game-container">
-        <!-- Stage 1: Drag Grey Blocks -->
+        <!-- Stage 1 -->
         <div id="stage-1">
             <h2>Stage 1: Drag Grey Blocks</h2>
             <p>Rearrange the grey blocks into the correct gradient (lightest to darkest):</p>
@@ -84,85 +98,94 @@
             <button class="button" onclick="checkStage1()">Submit</button>
         </div>
 
-        <!-- Stage 2: Pixel Match -->
+        <!-- Stage 2 -->
         <div id="stage-2" class="hidden">
             <h2>Stage 2: Pixel Match Puzzle</h2>
             <p>Click on the pixel that matches the colour shown below:</p>
             <div id="pixel-colour" style="margin-bottom: 10px; height: 50px; width: 50px; background: #8a2be2;"></div>
             <canvas id="pixelCanvas" width="300" height="300"></canvas>
-            <button class="button" onclick="checkStage2()">Submit</button>
         </div>
 
-        <!-- Final Stage -->
+        <!-- Stage 3 -->
+        <div id="stage-3" class="hidden">
+            <h2>Stage 3: Click the Moving Dot</h2>
+            <p>Click on the moving dot to proceed:</p>
+            <div id="moving-dot"></div>
+        </div>
+
+        <!-- Stage 4 -->
+        <div id="stage-4" class="hidden">
+            <h2>Stage 4: Symmetry Puzzle</h2>
+            <p>Arrange the shapes to form a symmetric pattern:</p>
+            <div class="puzzle-container" id="shapes-container">
+                <!-- Add shapes here -->
+            </div>
+        </div>
+
+        <!-- Stage 5 -->
+        <div id="stage-5" class="hidden">
+            <h2>Stage 5: Find the Hidden Shape</h2>
+            <p>Hover over the area to find the hidden shape!</p>
+            <div id="hidden-shape" style="width: 300px; height: 300px; background: #333; position: relative;"></div>
+        </div>
+
+        <!-- Stage 6 -->
+        <div id="stage-6" class="hidden">
+            <h2>Stage 6: Final Challenge</h2>
+            <p>Click the shapes in the correct sequence:</p>
+            <div class="puzzle-container">
+                <!-- Add clickable shapes here -->
+            </div>
+        </div>
+
+        <!-- Final Page -->
         <div id="final-stage" class="hidden">
             <h2>Congratulations!</h2>
             <p>Enter your email to join Project XAEL:</p>
-            <input type="email" id="email" placeholder="Enter your email" style="padding: 10px; width: 60%;">
+            <input type="email" id="email" placeholder="Enter your email">
             <button class="button" onclick="submitEmail()">Submit</button>
         </div>
     </div>
 
     <script>
-        // Drag-and-Drop Logic (Stage 1)
-        const colorBlocks = document.querySelectorAll('.color-block');
-        const dropZones = document.querySelectorAll('.drop-zone');
+        function nextStage(stageNumber) {
+            const currentStage = document.querySelector(`#stage-${stageNumber - 1}`);
+            const nextStage = document.querySelector(`#stage-${stageNumber}`);
+            if (currentStage) currentStage.classList.add('hidden');
+            if (nextStage) nextStage.classList.remove('hidden');
+        }
 
-        colorBlocks.forEach(block => {
-            block.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('order', e.target.dataset.order);
-                e.dataTransfer.setData('html', e.target.outerHTML);
-            });
-        });
-
-        dropZones.forEach(zone => {
-            zone.addEventListener('dragover', (e) => e.preventDefault());
-            zone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                if (!e.target.hasChildNodes()) {
-                    e.target.innerHTML = e.dataTransfer.getData('html');
-                }
-            });
-        });
+        function resetStage(stageNumber) {
+            const stage = document.querySelector(`#stage-${stageNumber}`);
+            if (stage) stage.classList.remove('hidden');
+        }
 
         function checkStage1() {
             const correctOrder = ['1', '2', '3'];
-            let playerOrder = [];
-            dropZones.forEach(zone => {
-                if (zone.firstChild) {
-                    playerOrder.push(zone.firstChild.dataset.order);
-                }
-            });
+            const playerOrder = Array.from(document.querySelectorAll('.drop-zone')).map(zone => zone.firstChild?.dataset.order || null);
             if (JSON.stringify(playerOrder) === JSON.stringify(correctOrder)) {
-                alert('Correct!');
                 nextStage(2);
             } else {
-                alert('Incorrect! Try again.');
+                resetStage(1);
             }
         }
 
-        // Stage 2: Pixel Match Logic
         const canvas = document.getElementById('pixelCanvas');
         const ctx = canvas.getContext('2d');
         const targetColour = '#8a2be2';
         let matched = false;
 
         function generatePixels() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             let targetPlaced = false;
             for (let x = 0; x < 300; x += 10) {
                 for (let y = 0; y < 300; y += 10) {
-                    const colour = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-                    ctx.fillStyle = colour;
+                    const randomColour = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+                    ctx.fillStyle = randomColour;
                     ctx.fillRect(x, y, 10, 10);
-
-                    // Randomly decide where to place the target colour
-                    if (Math.random() < 0.05 && !targetPlaced) {
+                    if (!targetPlaced && Math.random() < 0.05) {
                         ctx.fillStyle = targetColour;
                         ctx.fillRect(x, y, 10, 10);
-                        
-                        // Assign and log the target pixel coordinates
-                        targetPixel = { x: x / 10 + 1, y: y / 10 + 1 }; 
-                        console.log(`Target Pixel: X = ${targetPixel.x}, Y = ${targetPixel.y}`); // <-- This is the change
-                        
                         targetPlaced = true;
                     }
                 }
@@ -177,38 +200,38 @@
             const clickedColour = `rgb(${data[0]}, ${data[1]}, ${data[2]})`;
             const targetRGB = 'rgb(138, 43, 226)';
             if (clickedColour === targetRGB) {
-                alert('Correct pixel!');
                 matched = true;
+                nextStage(3);
             } else {
-                alert('Wrong pixel. Try again.');
+                resetStage(2);
             }
         });
 
         generatePixels();
 
-        function checkStage2() {
-            if (matched) {
-                alert('You passed Stage 2!');
-                nextStage(3); // Move to next stage
-            } else {
-                alert('Find the correct pixel first!');
-            }
+        const movingDot = document.getElementById('moving-dot');
+        let dotInterval;
+
+        function moveDot() {
+            let x = 0;
+            dotInterval = setInterval(() => {
+                x = (x + 5) % 300;
+                movingDot.style.left = `${x}px`;
+            }, 50);
         }
 
-        // Navigation between stages
-        function nextStage(stageNumber) {
-            document.querySelector(`#stage-${stageNumber - 1}`).classList.add('hidden');
-            document.querySelector(`#stage-${stageNumber}`).classList.remove('hidden');
-        }
+        movingDot.addEventListener('click', () => {
+            clearInterval(dotInterval);
+            nextStage(4);
+        });
+
+        moveDot();
 
         function submitEmail() {
             const email = document.getElementById('email').value;
-            if (email) {
-                alert(`Thank you for joining Project XAEL, ${email}!`);
-            } else {
-                alert('Please enter a valid email.');
-            }
+            alert(`Thank you for joining Project XAEL, ${email}!`);
         }
     </script>
 </body>
 </html>
+
