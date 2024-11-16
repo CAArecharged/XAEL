@@ -113,31 +113,6 @@
             <div id="moving-dot"></div>
         </div>
 
-        <!-- Stage 4 -->
-        <div id="stage-4" class="hidden">
-            <h2>Stage 4: Symmetry Puzzle</h2>
-            <p>Arrange the shapes to form a symmetric pattern:</p>
-            <div class="puzzle-container" id="shapes-container">
-                <!-- Add shapes here -->
-            </div>
-        </div>
-
-        <!-- Stage 5 -->
-        <div id="stage-5" class="hidden">
-            <h2>Stage 5: Find the Hidden Shape</h2>
-            <p>Hover over the area to find the hidden shape!</p>
-            <div id="hidden-shape" style="width: 300px; height: 300px; background: #333; position: relative;"></div>
-        </div>
-
-        <!-- Stage 6 -->
-        <div id="stage-6" class="hidden">
-            <h2>Stage 6: Final Challenge</h2>
-            <p>Click the shapes in the correct sequence:</p>
-            <div class="puzzle-container">
-                <!-- Add clickable shapes here -->
-            </div>
-        </div>
-
         <!-- Final Page -->
         <div id="final-stage" class="hidden">
             <h2>Congratulations!</h2>
@@ -160,6 +135,59 @@
             if (stage) stage.classList.remove('hidden');
         }
 
+        // Fixed Drag-and-Drop Logic (Stage 1)
+        const colorBlocks = document.querySelectorAll('.color-block');
+        const dropZones = document.querySelectorAll('.drop-zone');
+
+        colorBlocks.forEach(block => {
+            block.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', e.target.dataset.order);
+                e.dataTransfer.setData('html', e.target.outerHTML);
+                setTimeout(() => {
+                    e.target.style.display = 'none';
+                }, 0);
+            });
+
+            block.addEventListener('dragend', (e) => {
+                e.target.style.display = 'block';
+            });
+        });
+
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', (e) => e.preventDefault());
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const draggedOrder = e.dataTransfer.getData('text/plain');
+                const draggedElementHTML = e.dataTransfer.getData('html');
+
+                if (zone.firstChild) {
+                    zone.removeChild(zone.firstChild);
+                }
+
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = draggedElementHTML;
+                const draggedElement = tempDiv.firstChild;
+
+                draggedElement.style.display = 'block';
+                draggedElement.draggable = true;
+                draggedElement.dataset.order = draggedOrder;
+                zone.appendChild(draggedElement);
+
+                draggedElement.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', e.target.dataset.order);
+                    e.dataTransfer.setData('html', e.target.outerHTML);
+                    setTimeout(() => {
+                        e.target.style.display = 'none';
+                    }, 0);
+                });
+
+                draggedElement.addEventListener('dragend', (e) => {
+                    e.target.style.display = 'block';
+                });
+            });
+        });
+
         function checkStage1() {
             const correctOrder = ['1', '2', '3'];
             const playerOrder = Array.from(document.querySelectorAll('.drop-zone')).map(zone => zone.firstChild?.dataset.order || null);
@@ -170,6 +198,7 @@
             }
         }
 
+        // Generate Pixels (Stage 2)
         const canvas = document.getElementById('pixelCanvas');
         const ctx = canvas.getContext('2d');
         const targetColour = '#8a2be2';
@@ -214,24 +243,5 @@
 
         function moveDot() {
             let x = 0;
-            dotInterval = setInterval(() => {
-                x = (x + 5) % 300;
-                movingDot.style.left = `${x}px`;
-            }, 50);
-        }
-
-        movingDot.addEventListener('click', () => {
-            clearInterval(dotInterval);
-            nextStage(4);
-        });
-
-        moveDot();
-
-        function submitEmail() {
-            const email = document.getElementById('email').value;
-            alert(`Thank you for joining Project XAEL, ${email}!`);
-        }
-    </script>
-</body>
-</html>
+            dotInterval = setInterval(() =>
 
