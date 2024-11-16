@@ -227,4 +227,28 @@
 
         generatePixels();
 
-        const movingDot =
+        const movingDot = document.getElementById('moving-dot');
+        let dotInterval;
+
+        function moveDot() {
+            let x = 0;
+            dotInterval = setInterval(() => {
+                x = (x + 5) % 300;
+                movingDot.style.left = `${x}px`;
+            }, 50);
+        }
+
+        movingDot.addEventListener('click', () => {
+            clearInterval(dotInterval);
+            nextStage(4);
+        });
+
+        moveDot();
+
+        function submitEmail() {
+            const email = document.getElementById('email').value;
+            alert(`Thank you for joining Project XAEL, ${email}!`);
+        }
+    </script>
+</body>
+</html>
