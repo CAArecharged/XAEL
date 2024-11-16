@@ -50,7 +50,12 @@
             border: 2px solid #444;
             cursor: grab;
             transition: transform 0.2s;
+            background-color: grey;
         }
+        .color-block[data-order="1"] { background-color: #ddd; }
+        .color-block[data-order="2"] { background-color: #aaa; }
+        .color-block[data-order="3"] { background-color: #666; }
+
         .color-block:hover {
             transform: scale(1.1);
         }
@@ -86,9 +91,9 @@
             <h2>Stage 1: Drag Grey Blocks</h2>
             <p>Rearrange the grey blocks into the correct gradient (lightest to darkest):</p>
             <div class="puzzle-container" id="color-blocks">
-                <div class="color-block" draggable="true" style="background: #ddd;" data-order="1"></div>
-                <div class="color-block" draggable="true" style="background: #aaa;" data-order="2"></div>
-                <div class="color-block" draggable="true" style="background: #666;" data-order="3"></div>
+                <div class="color-block" draggable="true" data-order="1"></div>
+                <div class="color-block" draggable="true" data-order="2"></div>
+                <div class="color-block" draggable="true" data-order="3"></div>
             </div>
             <div class="puzzle-container" id="drop-zones">
                 <div class="drop-zone" data-index="1"></div>
@@ -135,14 +140,20 @@
             if (stage) stage.classList.remove('hidden');
         }
 
-        // Simplified and Reliable Drag-and-Drop Logic (Stage 1)
+        // Reliable Drag-and-Drop Logic (Stage 1)
         const colorBlocks = document.querySelectorAll('.color-block');
         const dropZones = document.querySelectorAll('.drop-zone');
 
         colorBlocks.forEach(block => {
             block.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('order', e.target.dataset.order);
-                e.dataTransfer.setData('elementId', e.target.id);
+                setTimeout(() => {
+                    e.target.classList.add('hidden'); // Temporarily hide the dragged element
+                }, 0);
+            });
+
+            block.addEventListener('dragend', (e) => {
+                e.target.classList.remove('hidden'); // Show the dragged element after dropping
             });
         });
 
@@ -151,30 +162,20 @@
 
             zone.addEventListener('drop', (e) => {
                 e.preventDefault();
-                
                 const draggedOrder = e.dataTransfer.getData('order');
-                
-                // Clear existing element in the drop zone
-                zone.innerHTML = '';
-                
-                // Create and append a new block to the drop zone
-                const newBlock = document.createElement('div');
-                newBlock.classList.add('color-block');
-                newBlock.style.background = getColorFromOrder(draggedOrder);
-                newBlock.dataset.order = draggedOrder;
-                zone.appendChild(newBlock);
+
+                // Clear any existing block in the drop zone
+                if (zone.firstChild) {
+                    zone.removeChild(zone.firstChild);
+                }
+
+                // Find the original block element and clone it into the drop zone
+                const originalBlock = document.querySelector(`.color-block[data-order="${draggedOrder}"]`);
+                const clonedBlock = originalBlock.cloneNode(true);
+                clonedBlock.classList.remove('hidden'); // Make sure the clone is visible
+                zone.appendChild(clonedBlock);
             });
         });
-
-        function getColorFromOrder(order) {
-            // Map order values to specific colors
-            switch(order) {
-                case '1': return '#ddd'; // Lightest
-                case '2': return '#aaa'; // Medium
-                case '3': return '#666'; // Darkest
-                default: return '#444';
-            }
-        }
 
         function checkStage1() {
             const correctOrder = ['1', '2', '3'];
@@ -226,9 +227,4 @@
 
         generatePixels();
 
-        const movingDot = document.getElementById('moving-dot');
-        let dotInterval;
-
-        function moveDot() {
-            let x = 0
-
+        const movingDot =
